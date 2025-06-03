@@ -1,219 +1,120 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // DOM elements
-    const dateInput = document.getElementById('expense-date');
-    const nameInput = document.getElementById('expense-name');
-    const amountInput = document.getElementById('expense-amount');
-    const addButton = document.getElementById('add-expense-btn');
-    const saveButton = document.getElementById('save-expenses-btn');
-    const clearButton = document.getElementById('clear-expenses-btn');
-    const tempList = document.getElementById('temp-expenses-list');
-    const tempTotalDisplay = document.getElementById('temp-total');
-    const currentDateDisplay = document.getElementById('current-date-display');
-    const summarySection = document.getElementById('expenses-summary');
-    const grandTotalDisplay = document.getElementById('grand-total');
-    const whatsappBtn = document.getElementById('whatsapp-btn');
+    const expenseNameInput = document.getElementById('expense-name');
+    const expenseAmountInput = document.getElementById('expense-amount');
+    const addBtn = document.getElementById('add-btn');
+    const expensesList = document.getElementById('expenses');
+    const totalAmountElement = document.getElementById('total-amount');
+    const shareBtn = document.getElementById('share-btn');
+    const shareGeneralBtn = document.getElementById('share-general-btn');
     
-    // Set default date to today
-    const today = new Date().toISOString().split('T')[0];
-    dateInput.value = today;
-    currentDateDisplay.textContent = formatDate(today);
+    let expenses = [];
+    let total = 0;
     
-    // Temporary expenses array for current session
-    let tempExpenses = [];
+    // Load expenses from localStorage if available
+    if (localStorage.getItem('expenses')) {
+        expenses = JSON.parse(localStorage.getItem('expenses'));
+        updateUI();
+    }
     
-    // Load saved expenses from localStorage
-    let savedExpenses = JSON.parse(localStorage.getItem('expenses')) || [];
-    renderSummary();
+    addBtn.addEventListener('click', addExpense);
     
-    // Event listeners
-    dateInput.addEventListener('change', function() {
-        currentDateDisplay.textContent = formatDate(this.value);
+    // Allow adding expense by pressing Enter
+    expenseAmountInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            addExpense();
+        }
     });
     
-    addButton.addEventListener('click', addExpense);
-    saveButton.addEventListener('click', saveExpenses);
-    clearButton.addEventListener('click', clearTempExpenses);
-    whatsappBtn.addEventListener('click', shareAllViaWhatsApp);
-    
-    // Functions
     function addExpense() {
-        const name = nameInput.value.trim();
-        const amount = parseFloat(amountInput.value);
-        const date = dateInput.value;
+        const name = expenseNameInput.value.trim();
+        const amount = parseFloat(expenseAmountInput.value);
         
-        if (!name || isNaN(amount) || amount <= 0) {
-            alert('Please enter a valid name and amount');
+        if (name === '' || isNaN(amount) || amount <= 0) {
+            alert('Please enter valid expense name and amount');
             return;
         }
         
         const expense = {
-            id: Date.now(),
-            date,
             name,
             amount
         };
         
-        tempExpenses.push(expense);
-        renderTempExpenses();
+        expenses.push(expense);
+        saveToLocalStorage();
+        updateUI();
         
         // Clear inputs
-        nameInput.value = '';
-        amountInput.value = '';
-        nameInput.focus();
+        expenseNameInput.value = '';
+        expenseAmountInput.value = '';
+        expenseNameInput.focus();
     }
     
-    function renderTempExpenses() {
-        tempList.innerHTML = '';
-        let total = 0;
+    function updateUI() {
+        // Clear the list
+        expensesList.innerHTML = '';
         
-        tempExpenses.forEach(expense => {
+        // Calculate total and update list
+        total = 0;
+        expenses.forEach((expense, index) => {
+            total += expense.amount;
+            
             const li = document.createElement('li');
             li.innerHTML = `
                 <span>${expense.name}</span>
-                <span>${expense.amount.toLocaleString()} RWF</span>
-                <button class="temp-expense-delete" data-id="${expense.id}">Delete</button>
+                <span>RWF ${expense.amount.toLocaleString()}</span>
             `;
-            tempList.appendChild(li);
-            total += expense.amount;
+            expensesList.appendChild(li);
         });
         
-        // Add event listeners to delete buttons
-        document.querySelectorAll('.temp-expense-delete').forEach(button => {
-            button.addEventListener('click', function(e) {
-                const id = parseInt(e.target.getAttribute('data-id'));
-                tempExpenses = tempExpenses.filter(expense => expense.id !== id);
-                renderTempExpenses();
-            });
-        });
-        
-        tempTotalDisplay.textContent = total.toLocaleString();
-        saveButton.disabled = tempExpenses.length === 0;
+        // Update total
+        totalAmountElement.textContent = `RWF ${total.toLocaleString()}`;
     }
     
-    function clearTempExpenses() {
-        tempExpenses = [];
-        renderTempExpenses();
+    function saveToLocalStorage() {
+        localStorage.setItem('expenses', JSON.stringify(expenses));
     }
     
-    function saveExpenses() {
-        if (tempExpenses.length === 0) return;
-        
-        savedExpenses = [...savedExpenses, ...tempExpenses];
-        localStorage.setItem('expenses', JSON.stringify(savedExpenses));
-        
-        // Reset temp expenses
-        clearTempExpenses();
-        renderSummary();
-        alert('Expenses saved successfully!');
+    function resetTracker() {
+        expenses = [];
+        total = 0;
+        localStorage.removeItem('expenses');
+        updateUI();
     }
     
-    function renderSummary() {
-        summarySection.innerHTML = '';
-        
-        if (savedExpenses.length === 0) {
-            summarySection.innerHTML = '<p>No expenses recorded yet.</p>';
-            grandTotalDisplay.textContent = '0';
+    shareBtn.addEventListener('click', function() {
+        shareToWhatsApp('+96878440900');
+    });
+    
+    shareGeneralBtn.addEventListener('click', function() {
+        shareToWhatsApp();
+    });
+    
+    function shareToWhatsApp(specificNumber = '') {
+        if (expenses.length === 0) {
+            alert('No expenses to share');
             return;
         }
         
-        // Group expenses by date
-        const groupedExpenses = savedExpenses.reduce((acc, expense) => {
-            if (!acc[expense.date]) {
-                acc[expense.date] = [];
-            }
-            acc[expense.date].push(expense);
-            return acc;
-        }, {});
+        let message = '📊 My Expenses (RWF):\n\n';
         
-        let grandTotal = 0;
-        
-        // Sort dates in descending order (newest first)
-        const sortedDates = Object.keys(groupedExpenses).sort((a, b) => new Date(b) - new Date(a));
-        
-        sortedDates.forEach(date => {
-            const dateExpenses = groupedExpenses[date];
-            const dateTotal = dateExpenses.reduce((sum, expense) => sum + expense.amount, 0);
-            grandTotal += dateTotal;
-            
-            const dateGroup = document.createElement('div');
-            dateGroup.className = 'expense-date-group';
-            
-            const dateHeader = document.createElement('div');
-            dateHeader.className = 'expense-date-header';
-            dateHeader.innerHTML = `
-                <span>${formatDate(date)}</span>
-                <span class="expense-date-total">Total: ${dateTotal.toLocaleString()} RWF</span>
-            `;
-            
-            dateGroup.appendChild(dateHeader);
-            
-            dateExpenses.forEach(expense => {
-                const expenseItem = document.createElement('div');
-                expenseItem.className = 'expense-item';
-                expenseItem.innerHTML = `
-                    <div>
-                        <span>${expense.name}</span>
-                        <span>${expense.amount.toLocaleString()} RWF</span>
-                    </div>
-                    <button class="delete-btn" data-id="${expense.id}">Delete</button>
-                `;
-                dateGroup.appendChild(expenseItem);
-            });
-            
-            summarySection.appendChild(dateGroup);
+        expenses.forEach(expense => {
+            message += `- ${expense.name}: RWF ${expense.amount.toLocaleString()}\n`;
         });
         
-        // Add event listeners to delete buttons
-        document.querySelectorAll('.delete-btn').forEach(button => {
-            button.addEventListener('click', deleteExpense);
-        });
-        
-        grandTotalDisplay.textContent = grandTotal.toLocaleString();
-    }
-    
-    function deleteExpense(e) {
-        const id = parseInt(e.target.getAttribute('data-id'));
-        savedExpenses = savedExpenses.filter(expense => expense.id !== id);
-        localStorage.setItem('expenses', JSON.stringify(savedExpenses));
-        renderSummary();
-    }
-    
-    function shareAllViaWhatsApp() {
-        if (savedExpenses.length === 0) return;
-        
-        let message = '📊 *All Expenses Summary*\n\n';
-        let grandTotal = 0;
-        
-        // Group by date
-        const groupedExpenses = savedExpenses.reduce((acc, expense) => {
-            if (!acc[expense.date]) acc[expense.date] = [];
-            acc[expense.date].push(expense);
-            return acc;
-        }, {});
-        
-        // Add expenses by date
-        Object.keys(groupedExpenses).sort((a, b) => new Date(b) - new Date(a)).forEach(date => {
-            const dateExpenses = groupedExpenses[date];
-            const dateTotal = dateExpenses.reduce((sum, expense) => sum + expense.amount, 0);
-            grandTotal += dateTotal;
-            
-            message += `📅 *${formatDate(date)}*\n`;
-            
-            dateExpenses.forEach(expense => {
-                message += `➡ ${expense.name}: ${expense.amount.toLocaleString()} RWF\n`;
-            });
-            
-            message += `💰 *Total: ${dateTotal.toLocaleString()} RWF*\n\n`;
-        });
-        
-        message += `🏦 *Grand Total: ${grandTotal.toLocaleString()} RWF*`;
+        message += `\n💰 Total: RWF ${total.toLocaleString()}`;
         
         const encodedMessage = encodeURIComponent(message);
-        window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
-    }
-    
-    function formatDate(dateString) {
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        return new Date(dateString).toLocaleDateString(undefined, options);
+        let whatsappUrl;
+        
+        if (specificNumber) {
+            whatsappUrl = `https://wa.me/${specificNumber}?text=${encodedMessage}`;
+        } else {
+            whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
+        }
+        
+        // Reset after sharing
+        setTimeout(resetTracker, 100);
+        
+        window.open(whatsappUrl, '_blank');
     }
 });
