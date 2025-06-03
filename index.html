@@ -3,54 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Expenses Tracker (RWF)</title>
+    <title>Expense Tracker (RWF)</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
-        <h1><i class="fas fa-money-bill-wave"></i> Royal Bakes </h1>
-
+        <h1>Expense Tracker (RWF)</h1>
+        
         <div class="input-section">
-            <div class="date-input">
-                <label for="expense-date"><i class="far fa-calendar-alt"></i> Date:</label>
-                <input type="date" id="expense-date">
-            </div>
-
-            <div class="expense-input">
-                <label for="expense-name"><i class="fas fa-tag"></i> Expense Name:</label>
-                <input type="text" id="expense-name" placeholder="e.g. Groceries">
-
-                <label for="expense-amount"><i class="fas fa-money-bill"></i> Amount (RWF):</label>
-                <input type="number" id="expense-amount" placeholder="0" min="0">
-
-                <button id="add-expense-btn"><i class="fas fa-plus-circle"></i> Add Expense</button>
-            </div>
-
-            <div class="temp-expenses">
-                <h3><i class="far fa-clock"></i> Current Expenses for <span id="current-date-display">Today</span></h3>
-                <ul id="temp-expenses-list"></ul>
-                <p class="temp-total-display">Total: <span id="temp-total">0</span> RWF</p>
-                <div class="action-buttons">
-                    <button id="clear-expenses-btn"><i class="fas fa-trash-alt"></i> Clear All</button>
-                    <button id="save-expenses-btn" disabled><i class="fas fa-save"></i> Save Expenses</button>
-                </div>
+            <input type="text" id="expense-name" placeholder="Expense name" required>
+            <input type="number" id="expense-amount" placeholder="Amount in RWF" min="0" required>
+            <button id="add-btn">Add Expense</button>
+        </div>
+        
+        <div class="expenses-list">
+            <h2>Your Expenses</h2>
+            <ul id="expenses"></ul>
+            <div class="total-section">
+                <strong>Total: </strong>
+                <span id="total-amount">RWF 0</span>
             </div>
         </div>
-
-        <div class="summary-section">
-            <div class="summary-header">
-                <h2><i class="fas fa-history"></i> Expenses History</h2>
-                <div class="share-controls">
-                    <label for="share-date"><i class="fas fa-share-alt"></i> Share Date:</label>
-                    <select id="share-date">
-                        <option value="">Select date to share</option>
-                    </select>
-                    <button id="whatsapp-share-btn" disabled><i class="fab fa-whatsapp"></i> Share via WhatsApp</button>
-                </div>
-            </div>
-            <div id="expenses-summary"></div>
-            <p class="grand-total">Grand Total: <span id="grand-total">0</span> RWF</p>
+        
+        <div class="share-buttons">
+            <button id="share-btn" class="share-btn">Send to My WhatsApp</button>
+            <button id="share-general-btn" class="share-general-btn">Share to Any WhatsApp</button>
         </div>
     </div>
 
