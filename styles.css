@@ -1,128 +1,122 @@
-:root {
-    --primary-color: #3498db;
-    --secondary-color: #2980b9;
-    --danger-color: #e74c3c;
-    --danger-hover: #c0392b;
-    --success-color: #2ecc71;
-    --success-hover: #27ae60;
-    --whatsapp-color: #25D366;
-    --whatsapp-hover: #128C7E;
-    --text-color: #333;
-    --light-bg: #f5f5f5;
-    --card-bg: #fff;
-    --border-color: #ddd;
-}
-
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    line-height: 1.6;
-    color: var(--text-color);
-    background-color: var(--light-bg);
+    background-color: #f5f5f5;
     padding: 20px;
 }
 
 .container {
-    max-width: 800px;
+    max-width: 500px;
     margin: 0 auto;
-    background: var(--card-bg);
-    padding: 25px;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-
-h1, h2, h3 {
-    color: var(--text-color);
-    margin-bottom: 15px;
-}
-
-h1 i, h2 i, h3 i {
-    margin-right: 10px;
-    color: var(--primary-color);
-}
-
-.input-section, .summary-section {
-    margin-bottom: 30px;
+    background-color: white;
     padding: 20px;
-    background: rgba(240, 240, 240, 0.5);
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
-    color: var(--text-color);
-}
-
-label i {
-    margin-right: 8px;
-    width: 20px;
+h1 {
     text-align: center;
+    color: #333;
+    margin-bottom: 20px;
 }
 
-input[type="date"],
-input[type="text"],
-input[type="number"],
-select {
-    width: 100%;
+.input-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+input {
     padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
     font-size: 16px;
-    transition: border 0.3s;
-}
-
-input[type="date"]:focus,
-input[type="text"]:focus,
-input[type="number"]:focus,
-select:focus {
-    border-color: var(--primary-color);
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
 }
 
 button {
-    background-color: var(--primary-color);
+    padding: 10px;
     color: white;
     border: none;
-    padding: 12px 18px;
-    border-radius: 6px;
+    border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
-    font-weight: 600;
-    transition: all 0.3s;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    transition: background-color 0.3s;
 }
 
-button i {
-    margin-right: 8px;
+#add-btn {
+    background-color: #4CAF50;
 }
 
-button:hover {
-    background-color: var(--secondary-color);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+#add-btn:hover {
+    background-color: #45a049;
 }
 
-button:disabled {
-    background-color: #95a5a6;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
+.expenses-list {
+    margin-top: 20px;
 }
 
-button:active {
-    transform: translateY(0);
+.expenses-list h2 {
+    margin-bottom: 10px;
+    color: #333;
 }
 
-/* Additional styles omitted for brevity */
+#expenses {
+    list-style-type: none;
+    margin-bottom: 20px;
+}
+
+#expenses li {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.total-section {
+    text-align: right;
+    padding: 10px;
+    font-size: 18px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+}
+
+.share-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.share-btn {
+    width: 100%;
+    background-color: #25D366;
+}
+
+.share-btn:hover {
+    background-color: #128C7E;
+}
+
+.share-general-btn {
+    width: 100%;
+    background-color: #075E54;
+}
+
+.share-general-btn:hover {
+    background-color: #054D42;
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 10px;
+    }
+    
+    .container {
+        padding: 15px;
+    }
+}
